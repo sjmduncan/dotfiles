@@ -8,13 +8,14 @@ backup_dir=$HOME/rc.old/
 bashrc_local=$HOME/.lbash
 
 cd home
-files_full=$(find ./ -type f -printf "%P\n")
+files_full=$(find ./ -type f)
 
 for f in $files_full; do
     # target file and link name for symlinks
     target=$(readlink -f $f;)
-    lname="$HOME/.$f"
+    lname="$HOME/.${f:2}"
 
+    echo "INFO: lname $lname"
     echo "INFO: Processing $target"
     
     # Containing directories for some config files might not exist.
@@ -50,7 +51,7 @@ for f in $files_full; do
 
     if [ "$makelink" -eq "1" ]; then
 	echo "INFO: Linking $lname to $target"
-	ln $target $lname
+#	ln $target $lname
     fi
     echo
 done
