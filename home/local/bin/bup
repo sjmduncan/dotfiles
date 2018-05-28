@@ -1,0 +1,37 @@
+#!/bin/bash
+set -ue
+
+dirs="Code Documents Pictures Photography"
+
+function helpme(){
+    echo
+    echo "usage:"
+    echo 
+    echo "bup <target-dir>"
+    echo
+    echo "Will backup the following:"
+    echo $dirs
+    echo
+    echo "edit the \$dir variable to add/remove dirs to backup"
+    echo
+}
+
+
+if [ $# -eq 1 ]; then
+    if [[ -d $1 ]]; then
+	echo
+	echo "backing up to $1"
+	echo
+	rsync -vruc $dirs $1
+    else
+	echo
+	echo "$1 is not a directory"
+	helpme
+	exit 0
+    fi
+else
+    helpme
+fi
+
+
+

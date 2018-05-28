@@ -1,0 +1,92 @@
+" Command history length
+set history=700
+
+filetype plugin on
+filetype indent on
+
+" Collapse stuff between syntactical blocks
+set foldmethod=indent
+set autoread
+
+" Set 7 lines to the cursor - when moving vertically using j/k
+set so=7
+
+" Turn on the WiLd menu and ignore compiled filetypes
+set wildmenu
+set wildignore=*.o,*~,*.pyc
+
+" Make backspace behave properly
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" Search ignores case
+set ignorecase
+set smartcase
+
+" Highlight search results
+set hlsearch
+
+" Makes search act like search in modern browsers
+set incsearch
+
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+
+" enable regexes
+set magic
+
+" Show matching brackets when text indicator is over them
+set showmatch
+
+" How many tenths of a second to blink when matching brackets
+set mat=2
+
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set tm=500
+
+syntax enable
+if has('gui_running')
+  set background=light
+else
+  set background=dark
+endif
+
+
+" Turn off backup and swap files. Save often, use VCS.
+set nobackup
+set nowb
+set noswapfile
+
+" Nice tab behaviours, sane tab & line widths
+set expandtab
+set smarttab
+set shiftwidth=2
+set tabstop=2
+set lbr
+set tw=60
+set ai "Auto indent
+set si "Smart indent
+set wrap "Wrap lines
+set nocindent
+
+" Markdown syntax highlighting for .md files
+au BufNewFile,BufFilePre,BufRead *.md set filetype=markdown
+
+" Enable line numbers, set line numbers relative to current line
+set number
+set relativenumber
+
+au BufNewFile,BufRead *.cu set ft=cuda
+au BufNewFile,BufRead *.cuh set ft=cuda
+
+set spellfile=~/.vim/spell/en.utf-8.add
+augroup markdownSpell
+  autocmd!
+  autocmd FileType markdown setlocal spell
+  autocmd BufRead,BufNewFile *.md setlocal spell
+  autocmd BufRead,BufNewFile *.tex setlocal spell
+augroup END
+
+set cm=blowfish2

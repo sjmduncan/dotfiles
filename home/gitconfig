@@ -1,0 +1,10 @@
+[alias]
+  l = "log --pretty=format:'%h %Cgreen%an%Cblue%d%Creset %cd%n%w(72)%s%n' --graph --decorate"
+  la = "log --pretty=format:'%h %Cgreen%an%Cblue%d%Creset %cd%n%w(72)%s%n' --graph --decorate --all"
+	s=status
+	c=commit
+	co=checkout
+  a=add
+	
+[push]
+	default = simple

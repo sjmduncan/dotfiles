@@ -1,0 +1,73 @@
+#!/bin/bash
+
+export PATH=i"$PATH:$HOME/.local/bin"
+
+# Don't mess with colours too much if we're using screen or tmux
+if [[ $TERM == xterm ]]; then TERM=xterm-256color; fi
+if [[ $TERM == screen ]]; then TERM=screen-256color; fi
+
+# Make some common stuff colorful
+alias grep='grep --color'
+alias ls='ls --color=auto'
+
+# If a symlink is to a directory then tab-complete includes the trailing slash
+bind 'set mark-symlinked-directories on'
+
+# Prefer nicer tools (but alias the same commands)
+if hash perl-rename 2>/dev/null; then
+    alias rename='perl-rename'; fi
+if hash htop 2>/dev/null; then
+    alias top='htop'; fi
+
+# Order of preference for the system editor
+if hash emacs 2>/dev/null; then
+    export EDITOR="emacs -nw"
+elif hash vim 2>/dev/null; then
+    export EDITOR=vim
+elif hash vi 2>/dev/null; then
+    export EDITOR=vi; fi
+
+# I'll never use ed anyway
+alias ed='$EDITOR'
+
+# Function for keeping daily logs in markdown
+function lbash_log(){
+    fname="$(date '+%Y.%m.%d').md"
+    
+    if [ $# -eq 1 ]; then
+	$EDITOR $1/$fname
+    else
+	echo "Please specify the directory that you'd like to log to"; fi
+}
+
+# Keep a personal log
+plogdir=$HOME/Documents/Log
+function plog() {
+    if [ ! -d $plogdir ]; then
+	mkdir -p $plogdir; fi
+    lbash_log $plogdir
+}
+
+# Prefer ipython3 
+if hash ipython3 2>/dev/null; then
+  alias ipython=ipython3
+fi
+
+
+# Print a short fortune
+function fort() {
+  echo; fortune -s -n 500; echo
+}
+
+# Up/Down arrows for partial command will cycle through history
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+
+# Ctrl-S/Ctrl-Q will no longer interrupt control
+stty -ixon
+
+# Print a short fortune at the start of every new terminal
+if hash fortune 2>/dev/null; then
+    fort; fi
+
+
