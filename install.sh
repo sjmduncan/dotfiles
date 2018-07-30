@@ -23,7 +23,7 @@ for f in $files_full; do
     ldir=$(dirname $lname)
     if [ ! -d "$ldir" ]; then
 	echo "INFO: creating $ldir"
-	mkdir -p $($ldir)
+	mkdir -p $ldir
     fi
     # Check if the
     makelink=0;
@@ -51,7 +51,7 @@ for f in $files_full; do
 
     if [ "$makelink" -eq "1" ]; then
 	echo "INFO: Linking $lname to $target"
-#	ln $target $lname
+	ln $target $lname
     fi
     echo
 done
