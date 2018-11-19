@@ -20,12 +20,11 @@ if hash htop 2>/dev/null; then
     alias top='htop'; fi
 
 # Order of preference for the system editor
-if hash emacs 2>/dev/null; then
-    export EDITOR="emacs -nw"
-elif hash vim 2>/dev/null; then
+if hash vim 2>/dev/null; then
     export EDITOR=vim
 elif hash vi 2>/dev/null; then
-    export EDITOR=vi; fi
+    export EDITOR=vi; 
+fi
 
 # I'll never use ed anyway
 alias ed='$EDITOR'
