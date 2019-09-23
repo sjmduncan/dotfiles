@@ -1,5 +1,0 @@
-# Add screen resolution for crappy laptop
-xrandr --newmode "1440x810R"   79.75  1440 1488 1520 1600  810 813 818 833 +hsync -vsync
-xrandr --addmode eDP-1 "1440x810R"
-xrandr --output eDP-1 --mode "1440x810R"
- 

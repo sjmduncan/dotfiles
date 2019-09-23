@@ -1,0 +1,7 @@
+x 2019-09-21 Dotfiles Undervolt
+x 2019-09-21 Dotfiles Reverse scroll
+x 2019-09-21 Dotfiles Powertop/TLP config
+x 2019-09-21 Dotfiles capsescap
+Dotfiles boot resume timeout
+Dotfiles install packages
+Dotfiles remove packages

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/setxkbmap -option "ctrl:nocaps"
+Exec=/usr/bin/setxkbmap -option "caps:swapescape"
 Hidden=false
 X-MATE-Autostart-enabled=true
 Name[en_US]=caps-escape

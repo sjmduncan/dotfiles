@@ -1,3 +1,7 @@
+call plug#begin('~/.vim/bundle')
+Plug 'lervag/vimtex'
+call plug#end()
+
 " Command history length
 set history=700
 
@@ -65,10 +69,9 @@ set smarttab
 set shiftwidth=2
 set tabstop=2
 set lbr
-set tw=60
+set tw=80
 set ai "Auto indent
 set si "Smart indent
-set wrap "Wrap lines
 set nocindent
 
 " Markdown syntax highlighting for .md files

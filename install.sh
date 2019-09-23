@@ -11,49 +11,30 @@ cd home
 files_full=$(find ./ -type f)
 
 for f in $files_full; do
-    # target file and link name for symlinks
-    target=$(readlink -f $f;)
-    lname="$HOME/.${f:2}"
+  # target file and link name for symlinks
+  src_path=$(readlink -f $f;)
+  tgt_path="$HOME/.${f:2}"
 
-    echo "INFO: lname $lname"
-    echo "INFO: Processing $target"
-    
-    # Containing directories for some config files might not exist.
-    # Create them here if they don't.
-    ldir=$(dirname $lname)
-    if [ ! -d "$ldir" ]; then
-	echo "INFO: creating $ldir"
-	mkdir -p $ldir
-    fi
-    # Check if the
-    makelink=0;
-    if [ -L $lname ]; then
-	# is a symlink
-	old_target=$(readlink $lname)
-	if [ $target -ef $old_target ]; then
-	    echo "INFO: Already installed :)"
-	else
-	    echo "WARN: Linked to $old_target"
-	    echo "WARN: Moving symlink to $backup_dir"
-	    mkdir -p $backup_dir
-	    mv $lname $backup_dir
-	    makelink=1
-	fi
-    elif [ -f $lname ]; then
-	mkdir -p $backup_dir
-	mv $lname $backup_dir
-	echo "WARN: File exists."
-	echo "WARN: Moving to $backup_dir"
-	makelink=1
-    else
-	makelink=1
-    fi
+  # Create missing directories
+  ldir=$(dirname $tgt_path)
+  if [ ! -d "$ldir" ]; then
+    echo "INFO: creating $ldir"
+    mkdir -p $ldir
+  fi
 
-    if [ "$makelink" -eq "1" ]; then
-	echo "INFO: Linking $lname to $target"
-	ln $target $lname
-    fi
-    echo
+  echo "INFO: $tgt_path"
+  if [ "$(stat -c "%d:%i" $tgt_path 2>>/dev/null)" == "$(stat -c "%d:%i" $src_path)" ]; then
+    echo "INFO: Already installed :)"
+  elif [ -f $tgt_path ]; then
+    echo "WARN: File exists with different dev or inode. Please manually
+    resolve"
+  else
+    echo "INFO: Installing from"
+    echo "INFO: $src_path"
+    ln $src_path $tgt_path
+  fi
+
+  echo
 done
 
 
