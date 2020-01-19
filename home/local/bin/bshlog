@@ -1,0 +1,129 @@
+#!/bin/bash
+
+source bshlog_config
+
+###############################################################################
+# Probably don't change stuff below this line
+
+tmp_index="/tmp/bshlog/index.md"
+sty_dir="style"
+src_dir="src"
+
+med_dir="$src_dir/media"
+tmpl_index="$sty_dir/template_index.md"
+tmpl_index_html="$sty_dir/template_index.html"
+tmpl_entry="$sty_dir/template_entry.md"
+tmpl_entry_html="$sty_dir/template_entry.html"
+
+# Force update existing articles
+bshl_force=false
+
+pandoc_args="--standalone --css=style.css --listings --mathjax --filter pandoc-citeproc"
+mkdir -p $bshlog_pubdir
+mkdir -p /tmp/bshlog/
+# Converts entries to html if the markdown is newer, ignores drafts returns true
+# if the entry should be added to the index (either updated or up-to-date and
+# non-draf)
+bshlog_pubifnewer(){ 
+  bshlog_addtoindex=true;
+  if $(head -7 "$1" | grep --quiet DRAFT); then
+    bshlog_addtoindex=false;
+    if [ "$1" -nt "$2" ] ; then 
+      echo "DRAFT U  $1 -> $2"
+      pandoc -o "$2" "$1" $pandoc_args --template "$tmpl_entry_html"
+    else
+      echo "DRAFT C  $1    $2"
+    fi
+  elif [ "$1" -nt "$2" ] ; then 
+    echo "UPDATING $1 -> $2"
+    pandoc -o "$2" "$1" $pandoc_args --template "$tmpl_entry_html"
+  elif [ "$3" = "true" ]; then
+    echo "FORCE    $1    $2" 
+  else
+    echo "CURRENT  $1    $2" 
+  fi
+}
+
+# Publish all modified entries and update the index page
+blog_publish(){
+  build_date="$(date +'%Y-%m-%d')"
+  cat "$tmpl_index" | sed "s/__TITLE__/$bshlog_title/;s/__AUTHOR__/$bshlog_author/;s/__DATE__/$build_date/" > "$tmp_index"
+  echo "Rebuilding updated entires..."
+  for file_in in `ls -r $src_dir/*.md`; do
+    file_out="${file_in##*/}"
+    file_name_out="$(echo $file_out | sed 's/md/html/')"
+    file_out="$bshlog_pubdir/$file_name_out"
+    bshlog_addtoindex=false;
+    bshlog_pubifnewer "$file_in" "$file_out" "$bshl_force"
+    if $bshlog_addtoindex; then
+      file_date=$(head -5 "$file_in" | grep -Ii 'date' | sed 's/[Dd]ate: *//;s/\r//')
+      file_title=$(head -5 "$file_in" | grep -Ii 'title' | sed 's/[Tt]itle: *//;s/\r//')
+      echo "[$file_date $file_title](./$file_name_out)" >> "$tmp_index"
+      echo >> "$tmp_index"
+    fi
+  done;
+
+  echo "Building Index"
+  pandoc -o "$bshlog_pubdir/index.html" "$tmp_index" $pandoc_args --template "$tmpl_index_html"
+  rm "$tmp_index"
+
+  if [ "style/style.css" -nt "$bshlog_pubdir/style.css" ]; then
+        echo "UPDATING style/style.css -> $bshlog_pubdir/style.css"
+        cp "style/style.css" "$bshlog_pubdir/style.css"
+    else
+        echo "CURRENT  style/style.css -> $bshlog_pubdir/style.css"
+    fi
+
+    echo "UPDATING media files"
+    if [ -d "$med_dir" ]; then
+      cp -vru "$med_dir" "$bshlog_pubdir/"
+    elif [ -f "$med_dir" ]; then
+        echo "$med_dir found a file, expected a diretory"
+    fi
+}
+
+# Create a new entry with todays date and a user-sepcified title
+blog_new(){
+  entry_date="$(date +'%Y-%m-%d')"
+  echo "Enter article title:"
+  read entry_title
+  filename="$entry_date-$(echo -n $entry_title | perl -pe 's/[\?\[\]\/\\=<>:;,''"&\$#*()|~`!{}%+]//g;' -pe 's/[\r\n\t -]+/-/g;')"
+  cat "$tmpl_entry" | sed "s/__TITLE__/$entry_title/;s/__AUTHOR__/$bshlog_author/;s/__DATE__/$entry_date/" > "$src_dir/$filename.md"
+  vim "$src_dir/$filename.md"
+}
+
+# Edit one of the unpublished draft entries
+blog_edit(){
+  drafts=()
+  for file_in in `ls -r $src_dir/*.md`; do
+    if $(head -7 "$file_in" | grep --quiet DRAFT); then
+      echo "${#drafts[*]}: $(grep -i 'title' $file_in |sed 's/[Tt][Ii][Tt][Ll][Ee]: //') ($file_in)"
+      drafts[${#drafts[*]}]=$file_in
+    fi
+  done
+  echo "Which file would you like to work on?"
+  read edit_idx
+
+  if ! [[ "$edit_idx" =~ ^[0-9]+$ ]]
+    then
+        echo "Sorry integers only"
+  elif [ "$edit_idx" -le ${#drafts[*]} ]; then
+   vim  ${drafts[$edit_idx]}
+  else
+   echo "Bad array index: $edit_idx"
+ fi
+}
+
+if [ $# -eq 1 ]; then
+  if [ "$1" = "p" ]; then 
+    bshl_force="false"
+    blog_publish
+  elif [ "$1" = "f" ]; then 
+    bshl_force="true"
+    blog_publish
+  elif [ "$1" = "n" ]; then blog_new
+  elif [ "$1" = "e" ]; then blog_edit
+  else
+    echo "Unknown argument"
+  fi
+fi

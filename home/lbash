@@ -2,7 +2,9 @@
 
 export todopath="$HOME/Dropbox/todo.txt"
 
-export PATH=i"$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.cargo/bin"
+
 
 # Don't mess with colours too much if we're using screen or tmux
 if [[ $TERM == xterm ]]; then TERM=xterm-256color; fi
